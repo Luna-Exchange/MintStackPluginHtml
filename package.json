@@ -1,14 +1,17 @@
 {
   "name": "nft-checkout-html",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "index.html",
   "scripts": {
+    "dev": "parcel index.html --open",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@babel/core": "^7.20.2",
+    "parcel-bundler": "^1.12.5",
     "typescript": "^4.9.3"
   },
   "dependencies": {
