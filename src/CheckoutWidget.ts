@@ -206,10 +206,8 @@ export class CheckoutWidget extends LitElement {
                 ></cover-image>
                 <div class="absolute" style=" inset: 0">
                   <div
-                    style="
-                  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(27, 28, 34, 0) 0.01%, #000000 100%);
-                  height: 60%
-               "
+                    style="background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(27, 28, 34, 0) 0.01%, #000000 100%);
+                          height: 60%;"
                     class="w-full transform -rotate-180 rounded-2xl"
                   ></div>
                 </div>
@@ -269,7 +267,7 @@ export class CheckoutWidget extends LitElement {
                                 width: 150px;
                                 color: ${this.mintInfo.checkout_font_color ? `${this.mintInfo.checkout_font_color}` : '#222221'};
                                 border: '1px solid #E8E8E8';
-                                background-color: '${this.mintInfo.checkout_background_color ? `${this.mintInfo.checkout_background_color}80` : '#F8F8F8'}'
+                                background-color: ${this.mintInfo.checkout_background_color ? `${this.mintInfo.checkout_background_color}80` : '#F8F8F8'}
                               "
                             >
                               <p class="flex items-center text-base font-normal justify-center">Price</p>
@@ -283,7 +281,7 @@ export class CheckoutWidget extends LitElement {
                                 width: 150px;
                                 color: ${this.mintInfo.checkout_font_color ? `${this.mintInfo.checkout_font_color}` : '#222221'};
                                 border: '1px solid #E8E8E8';
-                                background-color: '${this.mintInfo.checkout_background_color ? `${this.mintInfo.checkout_background_color}80` : '#F8F8F8'}'
+                                background-color: ${this.mintInfo.checkout_background_color ? `${this.mintInfo.checkout_background_color}80` : '#F8F8F8'}
                               "
                             >
                               <p class="flex items-center text-base font-normal justify-center">Total Mints</p>
@@ -358,7 +356,7 @@ export class CheckoutWidget extends LitElement {
                                 height: 34px;
                                 font-size: 14px;
                                 color: ${this.mintInfo.checkout_font_color ? `${this.mintInfo.checkout_font_color}` : 'white'};
-                                background-color: '${this.mintInfo.checkout_background_color ? `${this.mintInfo.checkout_background_color}80` : '#F8F8F8'}'
+                                background-color: ${this.mintInfo.checkout_background_color ? `${this.mintInfo.checkout_background_color}80` : '#222221'}
                               "
                               @click=${() => (this.mintSucceed = false)}
                             >
@@ -390,9 +388,7 @@ export class CheckoutWidget extends LitElement {
                                 <div class="flex flex-row gap-4 justify-center">
                                   <div
                                     class="flex flex-row gap-2 items-center text-xs cursor-pointer"
-                                    style="
-                                  color: ${this.mintInfo.checkout_font_color ? `${this.mintInfo.checkout_font_color}` : 'white'}
-                                "
+                                    style="color: ${this.mintInfo.checkout_font_color ? `${this.mintInfo.checkout_font_color}` : 'white'}"
                                     @click=${this.handleBack}
                                   >
                                     <!-- <Icon icon="akar-icons:arrow-left" /> -->
@@ -400,9 +396,7 @@ export class CheckoutWidget extends LitElement {
                                   </div>
                                   <div
                                     class="flex flex-row gap-2 items-center text-xs cursor-pointer"
-                                    style="
-                                  color: ${this.mintInfo.checkout_font_color ? `${this.mintInfo.checkout_font_color}` : 'white'}
-                                "
+                                    style="color: ${this.mintInfo.checkout_font_color ? `${this.mintInfo.checkout_font_color}` : 'white'}"
                                     @click=${this.handleForward}
                                   >
                                     <p>NEXT</p>
@@ -414,7 +408,7 @@ export class CheckoutWidget extends LitElement {
                           ${this.step === this.questions.length
                             ? html` <div class="flex flex-row justify-between gap-4 ">
                                 ${!this.mintInfo.random_mint
-                                  ? html` <div class="relative" style=" width: '50%' ">
+                                  ? html` <div class="relative" style=" width: 50% ">
                                       ${!this.nftCount
                                         ? html`<p
                                             class="absolute text-xs italic font-normal left-1 -top-5"
@@ -434,10 +428,10 @@ export class CheckoutWidget extends LitElement {
                                 <button
                                   @click=${this.connectWallet}
                                   class="h-8 font-normal border border-solid border-white rounded bg-none cursor-pointer active:enabled:scale-[0.99]"
-                                  style="width: '${!this.mintInfo.random_mint ? '50%' : '100%'}';
+                                  style="width: ${!this.mintInfo.random_mint ? '50%' : '100%'};
                                     font-size: 14px;
                                     color: ${this.mintInfo.checkout_font_color ? `${this.mintInfo.checkout_font_color}` : 'white'};
-                                    background-color: ${this.mintInfo.checkout_background_color ? `'${this.mintInfo.checkout_background_color}80'` : '#F8F8F8'}"
+                                    background-color: ${this.mintInfo.checkout_background_color ? `'${this.mintInfo.checkout_background_color}80'` : '#222221'}"
                                 >
                                   MINT NFT
                                 </button>
@@ -473,8 +467,7 @@ export class CheckoutWidget extends LitElement {
                             key="{index}"
                             src="{asset.image}"
                             class="cursor-pointer w-20 h-20 rounded-xl"
-                            style=" box-shadow:
-                      ${index === this.selectedNftIndex ? '0px 0px 4px 2px #8247E5' : 'none'}"
+                            style=" box-shadow: ${index === this.selectedNftIndex ? '0px 0px 4px 2px #8247E5' : 'none'}"
                             @click=${() => this.handleSelectNFT(index, asset)}
                           />`
                       )}
