@@ -1,15 +1,20 @@
 {
   "name": "nft-checkout-html",
   "version": "0.0.1",
-  "description": "",
+  "description": "HTML version of MintStack package based on Lit",
+  "author": "Leon Jin <ultraj0330@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Luna-Exchange/MintStackPluginHtml.git"
+  },
   "type": "module",
-  "main": "lib/index.cjs",
-  "module": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "main": "dist/CheckoutWidget*.js.map",
+  "module": "dist/CheckoutWidget*.js.map",
+  "types": "dist/CheckoutWidget*.js.map",
   "exports": {
     ".": {
-      "import": "./lib/index.js",
-      "require": "./lib/index.cjs"
+      "import": "./dist/CheckoutWidget*.js.map",
+      "require": "./dist/CheckoutWidget*.js.map"
     }
   },
   "files": [
@@ -23,7 +28,6 @@
     "clean": "shx rm -rf lib/*",
     "build": "npm run clean && tsup src/index.ts --format esm,cjs,iife --outDir ./lib --minify --dts"
   },
-  "author": "",
   "license": "ISC",
   "devDependencies": {
     "@babel/core": "^7.20.2",
