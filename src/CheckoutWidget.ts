@@ -427,7 +427,7 @@ export class CheckoutWidget extends LitElement {
                                         placeholder="Number of NFT"
                                         @input=${this.changeNftCount}
                                         class="w-full px-2 rounded h-8 ${!this.nftCount ? 'border-2 border-solid border-[#EB5757]' : 'border'}"
-                                        style="border-color: '${!this.nftCount ? '#EB5757' : '#222221'}'"
+                                        style="border-color: ${!this.nftCount ? '#EB5757' : '#222221'}"
                                       />
                                     </div>`
                                   : null}
@@ -437,9 +437,7 @@ export class CheckoutWidget extends LitElement {
                                   style="width: '${!this.mintInfo.random_mint ? '50%' : '100%'}';
                                     font-size: 14px;
                                     color: ${this.mintInfo.checkout_font_color ? `${this.mintInfo.checkout_font_color}` : 'white'};
-                                    background-color: '${this.mintInfo.checkout_background_color
-                                    ? `'${this.mintInfo.checkout_background_color}80'`
-                                    : '#F8F8F8'}'"
+                                    background-color: ${this.mintInfo.checkout_background_color ? `'${this.mintInfo.checkout_background_color}80'` : '#F8F8F8'}"
                                 >
                                   MINT NFT
                                 </button>
