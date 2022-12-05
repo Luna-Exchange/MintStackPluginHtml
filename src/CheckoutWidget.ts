@@ -158,15 +158,6 @@ export class CheckoutWidget extends LitElement {
 
     this.mintPrice = mintPrice;
 
-    // const tokenBalance = await this.contract.tokenMintedCount(id);
-    // const tokenBalanceReadable = parseInt(tokenBalance.toString());
-
-    // const maxSupply = await this.contract.tokenSupplies(id);
-    // const maxSupplyReadable = parseInt(maxSupply.toString());
-
-    // const mintRemaining = maxSupplyReadable ? maxSupplyReadable - tokenBalanceReadable : undefined;
-    // console.log(mintRemaining);
-
     const remainingSupply = await this.contract.remainingSupply();
     this.remainingSupply = remainingSupply.toString();
   };
