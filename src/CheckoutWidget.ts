@@ -2,11 +2,12 @@ import { ethers } from 'ethers';
 import { LitElement, html, css, CSSResultGroup } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { getMintInfo, getAllAssets } from './api/mint';
-import { ViewType, StageType, stages } from './type';
+import { ViewType, StageType, stages, views } from './type';
 import { style } from './styles/styles';
 import './CoverImage';
-import { logo, ethereum, twitter, facebook, instagram, out } from './assets/logo';
+import { logo, ethereum, twitter, facebook, instagram, discord, out } from './assets/logo';
 import abi from './assets/abi/collection.json';
+import 'lit-pagination';
 
 @customElement('checkout-widget')
 export class CheckoutWidget extends LitElement {
@@ -76,9 +77,31 @@ export class CheckoutWidget extends LitElement {
   @property({ type: Number })
   selectedNftIndex: number | undefined = undefined;
 
+  @property({ type: String })
+  breakpoint: string = 'desktop';
+
+  @property({ type: Number })
+  currentPage: number = 1;
+
+  @property({ type: Number })
+  limit: number = this.view === views.MINI ? 12 : this.breakpoint === 'mobile' ? 16 : 24;
+
   // createRenderRoot() {
   //   return this; // turn off shadow dom to access external styles
   // }
+
+  private _handleResize = () => {
+    // `this` refers to the component
+    this.breakpoint = window.innerWidth >= 768 ? 'desktop' : 'mobile';
+  };
+
+  constructor() {
+    super();
+
+    this.breakpoint = window.innerWidth >= 768 ? 'desktop' : 'mobile';
+
+    window.addEventListener('resize', this._handleResize);
+  }
 
   static styles?: CSSResultGroup | undefined = style;
 
@@ -181,29 +204,42 @@ export class CheckoutWidget extends LitElement {
 
   handleAgree = () => {
     if (this.mintInfo.is_multiple_nft && !this.mintInfo.random_mint) {
-      this.stage = stages.CHOOOSENFT;
+      this.stage = stages.CHOOSENFT;
     } else {
       this.stage = this.questions.length > 0 ? stages.QUESTION : stages.NORMAL;
     }
   };
 
+  handlePagination = () => {
+    const paginationObject = this.shadowRoot?.querySelector('lit-pagination') as any;
+    console.log(paginationObject.page);
+    this.currentPage = paginationObject.page;
+  };
+
   render() {
     return html`
-      <div class="container mx-auto rounded-2xl w-max :min-h-full" style="max-width: 864px; box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.5);">
+      <div class="container mx-auto rounded-2xl w-max min-h-full" style="max-width: 864px; box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.5);">
         <div
-          class="flex flex-row text-left w-full min-h-min box-border box rounded-2xl"
+          class="flex ${this.breakpoint === 'mobile' || this.view === views.MINI ? 'flex-col' : 'flex-row'} text-left w-full min-h-min box-border box rounded-2xl"
           style="background-color: ${this.mintInfo.checkout_background_color ? this.mintInfo.checkout_background_color : 'white'}"
         >
-          ${this.stage !== stages.CHOOOSENFT || this.mintInfo.random_mint
+          ${this.stage !== stages.CHOOSENFT || this.mintInfo.random_mint
             ? html`<div
                 class="relative items-center justify-center w-full border border-white border-solid h-full border-none rounded-2xl"
                 style="max-height: 421px; max-width: 421px"
               >
-                <cover-image
-                  .isRandomMint=${this.mintInfo.random_mint}
-                  .isMultipleNft=${this.mintInfo.is_multiple_nft}
-                  .assets=${!this.mintInfo.is_multiple_nft || this.mintInfo.random_mint ? this.mintInfo.image : this.mintInfo.assets}
-                ></cover-image>
+                ${this.selectedNftIndex
+                  ? html` <img
+                      src=${this.assets[this.selectedNftIndex].image}
+                      alt=""
+                      class="object-cover w-full h-full rounded-2xl"
+                      style=" width: 421px; height: 421px "
+                    />`
+                  : html` <cover-image
+                      .isRandomMint=${this.mintInfo.random_mint}
+                      .isMultipleNft=${this.mintInfo.is_multiple_nft}
+                      .assets=${!this.mintInfo.is_multiple_nft || this.mintInfo.random_mint ? this.mintInfo.image : this.assets}
+                    ></cover-image>`}
                 <div class="absolute" style=" inset: 0">
                   <div
                     style="background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(27, 28, 34, 0) 0.01%, #000000 100%);
@@ -213,40 +249,48 @@ export class CheckoutWidget extends LitElement {
                 </div>
               </div>`
             : null}
-          ${this.stage !== stages.CHOOOSENFT || this.mintInfo.random_mint
-            ? html`<div class="relative flex gap-4 mx-10 flex-row pt-7">
-                <div class="relative flex flex-col w-80 gap-6 mx-auto" style=" min-height: 350px; max-width: 357px ">
+          ${this.stage !== stages.CHOOSENFT || this.mintInfo.random_mint
+            ? html`<div class="relative flex ${this.breakpoint === 'mobile' ? 'flex-col gap-0' : 'gap-4 mx-10 flex-row'} pt-7">
+                <div
+                  class="relative flex flex-col w-80 gap-6 mx-auto"
+                  style="min-height: ${this.view === views.MINI ? '180px' : '350px'}; max-width: ${this.view === views.MINI ? '325px' : '357px'};"
+                >
                   <div class="flex flex-col">
-                    <div class="flex flex-col" style="color: ${this.mintInfo.checkout_font_color ? `${this.mintInfo.checkout_font_color}` : '#222221'}">
-                      <div class="flex flex-row gap-2 items-center">
-                        <p class="text-xl font-bold">Insomnia Access Pass</p>
-                        ${ethereum}
-                      </div>
-                      <p class="text-md font-normal">${this.mintInfo.name}</p>
-                    </div>
+                    ${this.view === views.NORMAL
+                      ? html`
+                          <div class="flex flex-col" style="color: ${this.mintInfo.checkout_font_color ? `${this.mintInfo.checkout_font_color}` : '#222221'}">
+                            <div class="flex flex-row gap-2 items-center">
+                              <p class="text-xl font-bold">${this.selectedNftIndex ? this.assets[this.selectedNftIndex].name : 'Insomnia Access Pass'}</p>
+                              ${ethereum}
+                            </div>
+                            <p class="text-md font-normal">${this.mintInfo.name}</p>
+                          </div>
+                        `
+                      : null}
                     ${this.stage === stages.NORMAL
-                      ? html`<div class="w-full max-w-md mx-auto bg-white rounded-lg mt-4">
-                            <button
-                              type="button"
-                              class="flex items-center justify-between w-full p-5 font-medium text-left text-gray-500 border ${this.isDescriptionCollapsed
-                                ? 'rounded-b-xl'
-                                : 'border-b-0'} border-gray-200 rounded-t-xl"
-                              @click=${this.handleDescription}
-                            >
-                              <span class="uppercase">description</span>
-                              <svg class="w-6 h-6 rotate-180 shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                  fill-rule="evenodd"
-                                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                  clip-rule="evenodd"
-                                ></path>
-                              </svg>
-                            </button>
-                            ${!this.isDescriptionCollapsed
-                              ? html`<div class="p-5 font-light border ${!this.isDescriptionCollapsed ? 'rounded-b-xl' : ''} border-gray-200">
-                                  <p
-                                    class="flex items-center text-xs"
-                                    style="
+                      ? html`${this.view === views.NORMAL
+                          ? html`<div class="w-full max-w-md mx-auto bg-white rounded-lg mt-4">
+                              <button
+                                type="button"
+                                class="flex items-center justify-between w-full p-5 font-medium text-left text-gray-500 border ${this.isDescriptionCollapsed
+                                  ? 'rounded-b-xl'
+                                  : 'border-b-0'} border-gray-200 rounded-t-xl"
+                                @click=${this.handleDescription}
+                              >
+                                <span class="uppercase">description</span>
+                                <svg class="w-6 h-6 rotate-180 shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                  <path
+                                    fill-rule="evenodd"
+                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                    clip-rule="evenodd"
+                                  ></path>
+                                </svg>
+                              </button>
+                              ${!this.isDescriptionCollapsed
+                                ? html`<div class="p-5 font-light border ${!this.isDescriptionCollapsed ? 'rounded-b-xl' : ''} border-gray-200">
+                                    <p
+                                      class="flex items-center text-xs"
+                                      style="
                                       display: '-webkit-box';
                                       -webkit-line-clamp: 2;
                                       -Webkit-box-orient: 'vertical';
@@ -254,40 +298,58 @@ export class CheckoutWidget extends LitElement {
                                       color: ${this.mintInfo.checkout_font_color ? `${this.mintInfo.checkout_font_color}` : '#222221'};
                                       min-height: 32px
                                     "
-                                  >
-                                    ${this.mintInfo.description}
+                                    >
+                                      ${this.mintInfo.description}
+                                    </p>
+                                  </div>`
+                                : null}
+                            </div> `
+                          : null}
+                        ${this.mintInfo.is_multiple_nft && !this.active
+                          ? html`
+                              <div
+                                class="flex flex-col rounded-lg py-2 w-full items-center mt-4"
+                                style="
+                                  color: ${this.mintInfo.checkout_font_color ? `${this.mintInfo.checkout_font_color}` : '#222221'};
+                                  border: '1px solid #E8E8E8';
+                                  background-color: ${this.mintInfo.checkout_background_color ? `${this.mintInfo.checkout_background_color}80` : '#F8F8F8'}
+                                  "
+                              >
+                                <p>Total Collection</p>
+                                <p>${this.assets?.length} NFT</p>
+                              </div>
+                            `
+                          : html`
+                              <div class="flex flex-row justify-between pt-4 gap-2">
+                                <div
+                                  class="flex flex-col gap-1 rounded-lg py-2"
+                                  style="
+                                width: 150px;
+                                color: ${this.mintInfo.checkout_font_color ? `${this.mintInfo.checkout_font_color}` : '#222221'};
+                                border: '1px solid #E8E8E8';
+                                background-color: ${this.mintInfo.checkout_background_color ? `${this.mintInfo.checkout_background_color}80` : '#F8F8F8'}
+                              "
+                                >
+                                  <p class="flex items-center text-base font-normal justify-center">Price</p>
+                                  <p class="flex items-center text-base font-semibold justify-center">
+                                    ${this.active ? this.mintPrice : '-'} ${this.active ? (this.mintInfo.chain === 'ethereum' ? 'ETH' : 'MATIC') : null}
                                   </p>
-                                </div>`
-                              : null}
-                          </div>
-                          <div class="flex flex-row justify-between pt-4 gap-2">
-                            <div
-                              class="flex flex-col gap-1 rounded-lg py-2"
-                              style="
+                                </div>
+                                <div
+                                  class="flex flex-col gap-1 rounded-lg py-2"
+                                  style="
                                 width: 150px;
                                 color: ${this.mintInfo.checkout_font_color ? `${this.mintInfo.checkout_font_color}` : '#222221'};
                                 border: '1px solid #E8E8E8';
                                 background-color: ${this.mintInfo.checkout_background_color ? `${this.mintInfo.checkout_background_color}80` : '#F8F8F8'}
                               "
-                            >
-                              <p class="flex items-center text-base font-normal justify-center">Price</p>
-                              <p class="flex items-center text-base font-semibold justify-center">
-                                ${this.active ? this.mintPrice : '-'} ${this.active ? (this.mintInfo.chain === 'ethereum' ? 'ETH' : 'MATIC') : null}
-                              </p>
-                            </div>
-                            <div
-                              class="flex flex-col gap-1 rounded-lg py-2"
-                              style="
-                                width: 150px;
-                                color: ${this.mintInfo.checkout_font_color ? `${this.mintInfo.checkout_font_color}` : '#222221'};
-                                border: '1px solid #E8E8E8';
-                                background-color: ${this.mintInfo.checkout_background_color ? `${this.mintInfo.checkout_background_color}80` : '#F8F8F8'}
-                              "
-                            >
-                              <p class="flex items-center text-base font-normal justify-center">Total Mints</p>
-                              <p class="flex items-center text-base font-semibold justify-center">${this.active ? this.remainingSupply : '-'}</p>
-                            </div>
-                          </div>`
+                                >
+                                  <p class="flex items-center text-base font-normal justify-center">Total Mints</p>
+                                  <p class="flex items-center text-base font-semibold justify-center">${this.active ? this.remainingSupply : '-'}</p>
+                                </div>
+                              </div>
+                            `}
+                        `
                       : this.stage === stages.TERMS
                       ? html` ${this.questions.length > 0
                             ? html` <div
@@ -440,54 +502,76 @@ export class CheckoutWidget extends LitElement {
                         </div>`}
                   </div>
                 </div>
-                <div class="flex items-center justify-start gap-4 flex-col mb-0 px-0 z-10">
-                  ${this.mintInfo.social_links
-                    ? this.mintInfo.social_links.find((item: any) => item.name === 'twitter')
-                      ? html`${twitter}`
-                      : this.mintInfo.social_links.find((item: any) => item.name === 'facebook')
-                      ? html`${facebook}`
-                      : this.mintInfo.social_links.find((item: any) => item.name === 'instagram')
-                      ? html`${instagram}`
-                      : null
+                <div
+                  class="flex ${this.breakpoint === 'mobile'
+                    ? 'flex-row items-start justify-start mb-2 px-2'
+                    : 'items-center justify-start flex-col mb-0 px-0'} gap-4 z-10"
+                >
+                  ${this.view === views.NORMAL && this.mintInfo.social_links?.length > 0
+                    ? this.mintInfo.social_links.map(
+                        (link: any, index: any) => html`
+                          <a key=${index} href=${link.url} target="_blank" rel="noreferrer"
+                            >${link.name === 'twitter'
+                              ? html`${twitter}`
+                              : link.name === 'facebook'
+                              ? html`${facebook}`
+                              : link.name === 'instagram'
+                              ? html`${instagram}`
+                              : link.name === 'discord'
+                              ? html`${discord}`
+                              : null}</a
+                          >
+                        `
+                      )
                     : null}
                   <div class="cursor-pointer">${this.active ? html`${out}` : null}</div>
                 </div>
                 <div class="absolute bottom-2 flex flex-row gap-2 w-full items-center justify-center">
-                  <p class="text-xs font-normal">Powered by:</p>
+                  <p class="text-xs font-normal" style="color: ${this.mintInfo.checkout_font_color ? `${this.mintInfo.checkout_font_color}` : '#222221'}">Powered by:</p>
                   ${logo}
                 </div>
               </div>`
             : html`
-                <div class="flex gap-6 mx-10 flex-row p-9 mx-auto">
+                <div class="flex ${this.breakpoint === 'mobile' ? 'gap-4 flex-col' : 'gap-6 mx-10 flex-row'} p-9 mx-auto">
                   <div class="flex flex-col gap-8">
-                    <div class="grid w-full grid-cols-8 grid-rows-3 gap-4">
-                      ${this.assetsList?.map(
-                        (asset: any, index: any) =>
-                          html`<img
-                            key="{index}"
-                            src="{asset.image}"
-                            class="cursor-pointer w-20 h-20 rounded-xl"
-                            style=" box-shadow: ${index === this.selectedNftIndex ? '0px 0px 4px 2px #8247E5' : 'none'}"
-                            @click=${() => this.handleSelectNFT(index, asset)}
-                          />`
-                      )}
-                    </div>
-                    <div class="flex flex-row justify-between items-center">
+                    <div
+                      class="grid w-full ${this.view === views.MINI
+                        ? 'grid-cols-3 grid-rows-4'
+                        : this.breakpoint === 'mobile'
+                        ? 'grid-cols-4 grid-rows-4'
+                        : 'grid-cols-8 grid-rows-3'} gap-4"
+                    >
                       ${this.assets
-                        ? `<Pagination
-                    count={Math.ceil(assets.length / (windowSize.innerWidth < 768 ? 16 : 24))}
-                    page={currentNFTPgae}
-                    shape="rounded"
-                    onChange={handlePaginationChange}
-                  />`
+                        ?.slice((this.currentPage - 1) * this.limit, this.currentPage * this.limit)
+                        .map(
+                          (asset: any, index: any) =>
+                            html`<img
+                              key="${index}"
+                              src="${asset.image}"
+                              class="cursor-pointer w-20 h-20 rounded-xl"
+                              style=" box-shadow: ${index === this.selectedNftIndex ? '0px 0px 4px 2px #8247E5' : 'none'}"
+                              @click=${() => this.handleSelectNFT(index, asset)}
+                            />`
+                        )}
+                    </div>
+                    <div class="flex ${this.breakpoint === 'mobile' || this.view === views.MINI ? 'flex-col' : 'flex-row'} justify-between items-center">
+                      ${this.assets
+                        ? html`<lit-pagination
+                            page="1"
+                            total=${this.assets.length}
+                            limit=${this.breakpoint === 'mobile' ? 16 : 24}
+                            size="2"
+                            @click=${() => this.handlePagination()}
+                          ></lit-pagination>`
                         : null}
                       <button
-                        class="w-80 font-normal border border-white border-solid rounded cursor-pointer bg-black mt-2 uppercase disabled:cursor-not-allowed"
+                        class="w-60 font-normal border border-white border-solid rounded cursor-pointer bg-black mt-2 uppercase disabled:cursor-not-allowed"
                         style="
                           padding: 6px;
                           font-size: 14px;
                           color: ${this.mintInfo.checkout_font_color ? `${this.mintInfo.checkout_font_color}` : 'white'};
                         "
+                        .disabled=${this.selectedNftIndex ? false : true}
                         @click=${() => {
                           this.stage = this.questions.length > 0 ? stages.QUESTION : stages.NORMAL;
                         }}
@@ -496,13 +580,27 @@ export class CheckoutWidget extends LitElement {
                       </button>
                     </div>
                   </div>
-                  <div class="flex items-center justify-start gap-4 flex-col mb-0 px-0 z-10">
-                    ${this.mintInfo.social_links.find((item: any) => item.name === 'twitter')
-                      ? html`${twitter}`
-                      : this.mintInfo.social_links.find((item: any) => item.name === 'facebook')
-                      ? html`${facebook}`
-                      : this.mintInfo.social_links.find((item: any) => item.name === 'instagram')
-                      ? html`${instagram}`
+                  <div
+                    class="flex ${this.breakpoint === 'mobile'
+                      ? 'flex-row items-start justify-start mb-2 px-2'
+                      : 'items-center justify-start flex-col mb-0 px-0'} gap-4 z-10"
+                  >
+                    ${this.view === views.NORMAL && this.mintInfo.social_links?.length > 0
+                      ? this.mintInfo.social_links.map(
+                          (link: any, index: any) => html`
+                            <a key=${index} href=${link.url} target="_blank" rel="noreferrer"
+                              >${link.name === 'twitter'
+                                ? html`${twitter}`
+                                : link.name === 'facebook'
+                                ? html`${facebook}`
+                                : link.name === 'instagram'
+                                ? html`${instagram}`
+                                : link.name === 'discord'
+                                ? html`${discord}`
+                                : null}</a
+                            >
+                          `
+                        )
                       : null}
                     <div class="cursor-pointer">${this.active ? html`${out}` : null}</div>
                   </div>

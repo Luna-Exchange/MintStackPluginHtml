@@ -9,7 +9,7 @@ export const stages = {
   TERMS : 'TERMS',
   QUESTION : 'QUESTION',
   NORMAL : 'NORMAL',
-  CHOOOSENFT : 'CHOOSENFT'
+  CHOOSENFT : 'CHOOSENFT'
 }
 
 export type StageType = typeof stages[keyof typeof stages];

@@ -35,7 +35,7 @@ export class CoverImage extends LitElement {
       style=" width: 421px; height: 421px "
     >
       ${Array.isArray(this.assets) && this.assets.map(
-        (asset: any, index: any) => `<img key=${index} src=${asset.image} />`
+        (asset: any, index: any) => html`<img key=${index} src=${asset.image} />`
       )}
     </div>`;
 
@@ -48,7 +48,7 @@ export class CoverImage extends LitElement {
           .slice(0, 3)
           .map(
             (asset: any, index: any) =>
-              `<img key=${index} src=${asset.image} />`
+            html`<img key=${index} src=${asset.image} />`
           )}
       </div>
       <div class="grid grid-cols-2">
@@ -56,7 +56,7 @@ export class CoverImage extends LitElement {
           .slice(3, 5)
           .map(
             (asset: any, index: any) =>
-              `<img key=${index} src=${asset.image} />`
+            html`<img key=${index} src=${asset.image} />`
           )}
       </div>
       <div class="grid grid-cols-3">
@@ -64,7 +64,7 @@ export class CoverImage extends LitElement {
           .slice(5, 8)
           .map(
             (asset: any, index: any) =>
-              `<img key=${index} src=${asset.image} />`
+              html`<img key=${index} src=${asset.image} />`
           )}
       </div>
     </div>`;
@@ -78,7 +78,7 @@ export class CoverImage extends LitElement {
           .slice(0, 2)
           .map(
             (asset: any, index: any) =>
-              `<img key=${index} src=${asset.image} />`
+              html`<img key=${index} src=${asset.image} />`
           )}
       </div>
       <div class="grid grid-cols-3">
@@ -86,7 +86,7 @@ export class CoverImage extends LitElement {
           .slice(2, 5)
           .map(
             (asset: any, index: any) =>
-              `<img key=${index} src=${asset.image} />`
+              html`<img key=${index} src=${asset.image} />`
           )}
       </div>
       <div class="grid grid-cols-2">
@@ -94,7 +94,7 @@ export class CoverImage extends LitElement {
           .slice(5, 7)
           .map(
             (asset: any, index: any) =>
-              `<img key=${index} src=${asset.image} />`
+              html`<img key=${index} src=${asset.image} />`
           )}
       </div>
     </div>`;
@@ -117,7 +117,7 @@ export class CoverImage extends LitElement {
           .slice(0, 3)
           .map(
             (asset: any, index: any) =>
-              `<img key=${index} src=${asset.image} />`
+              html`<img key=${index} src=${asset.image} />`
           )}
       </div>
       <div class="grid grid-rows-2">
@@ -125,7 +125,7 @@ export class CoverImage extends LitElement {
           .slice(3, 5)
           .map(
             (asset: any, index: any) =>
-              `<img key=${index} src=${asset.image} />`
+              html`<img key=${index} src=${asset.image} />`
           )}
       </div>
     </div>`;
@@ -136,7 +136,7 @@ export class CoverImage extends LitElement {
     >
       ${Array.isArray(this.assets) && this.assets.map(
         (asset: any, index: any) =>
-          `<img class="object-cover w-full h-full" key=${index} src=${asset.image} />`
+          html`<img class="object-cover w-full h-full" key=${index} src=${asset.image} />`
       )}
     </div>`;
 
@@ -149,7 +149,7 @@ export class CoverImage extends LitElement {
           .slice(0, 2)
           .map(
             (asset: any, index: any) =>
-              `<img class="object-cover" key=${index} src=${asset.image} />`
+              html`<img class="object-cover" key=${index} src=${asset.image} />`
           )}
       </div>
       <div class="grid grid-cols-1">
@@ -157,7 +157,7 @@ export class CoverImage extends LitElement {
           .slice(2, 3)
           .map(
             (asset: any, index: any) =>
-              `<img key=${index} src=${asset.image} />`
+              html`<img key=${index} src=${asset.image} />`
           )}
       </div>
     </div>`;
