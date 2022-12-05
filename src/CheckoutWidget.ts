@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import { LitElement, html, css, CSSResultGroup } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { getMintInfo, getAllAssets } from './api/mint';
+import { getMintInfo, getAllAssets, answerMintQuestions } from './api/mint';
 import { ViewType, StageType, stages, views } from './type';
 import { style } from './styles/styles';
 import './CoverImage';
@@ -19,6 +19,9 @@ export class CheckoutWidget extends LitElement {
 
   @property({ type: Object })
   signer: any = {};
+
+  @property({ type: String })
+  address: string = '';
 
   @property({ type: Object })
   contract: any = {};
@@ -106,7 +109,7 @@ export class CheckoutWidget extends LitElement {
   static styles?: CSSResultGroup | undefined = style;
 
   updated = (changedProperties: Map<string, unknown>) => {
-    if (changedProperties.has('signer') && Object.keys(this.signer).length > 0) {
+    if (changedProperties.has('mintInfo') && Object.keys(this.mintInfo).length > 0) {
       const contract = new ethers.Contract(this.mintInfo.contract_address, abi, this.signer);
       this.contract = contract;
     }
@@ -117,14 +120,22 @@ export class CheckoutWidget extends LitElement {
   };
 
   setWeb3 = async () => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const provider = new ethers.providers.Web3Provider(window.ethereum, 'any');
     this.provider = provider;
 
-    const accounts = await window.ethereum.request({ method: 'eth_accounts' });
-    if (accounts.length) {
-      this.active = true;
-      this.signer = provider.getSigner();
-    }
+    // const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+    // if (accounts.length) {
+    //   this.active = true;
+    //   this.signer = provider.getSigner();
+    // }
+    // const addresses = await provider.send('eth_requestAccounts', []);
+    // this.address = addresses[0];
+    // this.signer = provider.getSigner();
+
+    // if (this.mintInfo.contract_address) {
+    //   const contract = new ethers.Contract(this.mintInfo.contract_address, abi, this.signer);
+    //   this.contract = contract;
+    // }
   };
 
   setInfo = async () => {
@@ -141,22 +152,23 @@ export class CheckoutWidget extends LitElement {
 
   getTokenInfo = async () => {
     const id = this.mintInfo.random_mint ? 1 : this.tokenId ? this.tokenId : 1;
-    const resMintPrice = await this.contract.tokenPrices(id);
+    console.log(id, this.contract);
+    const resMintPrice = await this.contract.tokenPrices(Number(id));
     const mintPrice = parseFloat(ethers.utils.formatEther(resMintPrice.toString()));
 
     this.mintPrice = mintPrice;
 
-    const tokenBalance = await this.contract.tokenMintedCount(id);
-    const tokenBalanceReadable = parseInt(tokenBalance.toString());
+    // const tokenBalance = await this.contract.tokenMintedCount(id);
+    // const tokenBalanceReadable = parseInt(tokenBalance.toString());
 
-    const maxSupply = await this.contract.tokenSupplies(id);
-    const maxSupplyReadable = parseInt(maxSupply.toString());
+    // const maxSupply = await this.contract.tokenSupplies(id);
+    // const maxSupplyReadable = parseInt(maxSupply.toString());
 
-    const mintRemaining = maxSupplyReadable ? maxSupplyReadable - tokenBalanceReadable : undefined;
-    console.log(mintRemaining);
+    // const mintRemaining = maxSupplyReadable ? maxSupplyReadable - tokenBalanceReadable : undefined;
+    // console.log(mintRemaining);
 
     const remainingSupply = await this.contract.remainingSupply();
-    this.remainingSupply = remainingSupply;
+    this.remainingSupply = remainingSupply.toString();
   };
 
   async connectedCallback(): Promise<void> {
@@ -168,9 +180,73 @@ export class CheckoutWidget extends LitElement {
   }
 
   connectWallet = async () => {
-    console.log(this.provider);
-    await this.provider.send('eth_requestAccounts', []);
+    let addresses = await this.provider.send('eth_requestAccounts', []);
+    await window.ethereum.request({
+      method: 'wallet_switchEthereumChain',
+      params: [
+        {
+          chainId: this.mintInfo.chain === 'ethereum' ? '0x5' : '0x13881',
+        },
+      ],
+    });
+    this.address = addresses[0];
     this.signer = this.provider.getSigner();
+
+    if (this.mintInfo.contract_address) {
+      const contract = new ethers.Contract(this.mintInfo.contract_address, abi, this.signer);
+      this.contract = contract;
+    }
+
+    this.stage = stages.TERMS;
+  };
+
+  mintNft = async () => {
+    if (this.contract) {
+      if (!this.mintInfo.random_mint && !this.nftCount) {
+        return;
+      }
+
+      this.mintProcessing = true;
+      const count = this.mintInfo.random_mint ? 1 : this.nftCount;
+      // console.log(account, this.mintInfo.random_mint ? 1 : tokenId ? tokenId : 1, count);
+      if (!this.mintPrice) return;
+      try {
+        const tx = await this.contract.mint(this.address, this.mintInfo.random_mint ? 1 : this.tokenId ? this.tokenId : 1, count, {
+          value: ethers.utils.parseEther((this.mintPrice * count).toString()),
+        });
+        await tx.wait();
+        console.log('mint success!');
+        this.mintSucceed = true;
+
+        const remainingSupply = await this.contract.remainingSupply();
+        this.remainingSupply = remainingSupply.toString();
+
+        if (this.mintInfo.first_party_data.length > 0) {
+          this.postAnswers();
+        }
+      } catch (error) {
+        console.warn(error);
+      }
+      this.mintProcessing = false;
+    }
+  };
+
+  postAnswers = () => {
+    if (this.address) {
+      let firstPartyAnswers: any[] = this.mintInfo.first_party_data.map((item: any, index: number) => ({
+        question_type: item.type,
+        question: item.question,
+        answer: this.answers[index],
+      }));
+
+      answerMintQuestions(this.collectionId, this.address, firstPartyAnswers)
+        .then(async (response: any) => {
+          console.log('answerMintQuestions response:', response);
+        })
+        .catch((error: any) => {
+          console.log('answerMintQuestions error:', error);
+        });
+    }
   };
 
   handleDescription = () => {
@@ -220,7 +296,9 @@ export class CheckoutWidget extends LitElement {
     return html`
       <div class="container mx-auto rounded-2xl w-max min-h-full" style="max-width: 864px; box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.5);">
         <div
-          class="flex ${this.breakpoint === 'mobile' || this.view === views.MINI ? 'flex-col' : 'flex-row'} text-left w-full min-h-min box-border box rounded-2xl"
+          class="flex ${this.breakpoint === 'mobile' || this.view === views.MINI
+            ? 'flex-col'
+            : 'flex-row'} text-left w-full min-h-min box-border box rounded-2xl"
           style="background-color: ${this.mintInfo.checkout_background_color ? this.mintInfo.checkout_background_color : 'white'}"
         >
           ${this.stage !== stages.CHOOSENFT || this.mintInfo.random_mint
@@ -250,7 +328,7 @@ export class CheckoutWidget extends LitElement {
               </div>`
             : null}
           ${this.stage !== stages.CHOOSENFT || this.mintInfo.random_mint
-            ? html`<div class="relative flex ${this.breakpoint === 'mobile' ? 'flex-col gap-0' : 'gap-4 mx-10 flex-row'} pt-7">
+            ? html`<div class="relative flex ${this.breakpoint === 'mobile' || this.view === views.MINI ? 'flex-col gap-0' : 'gap-4 mx-10 flex-row'} pt-7">
                 <div
                   class="relative flex flex-col w-80 gap-6 mx-auto"
                   style="min-height: ${this.view === views.MINI ? '180px' : '350px'}; max-width: ${this.view === views.MINI ? '325px' : '357px'};"
@@ -305,7 +383,7 @@ export class CheckoutWidget extends LitElement {
                                 : null}
                             </div> `
                           : null}
-                        ${this.mintInfo.is_multiple_nft && !this.active
+                        ${this.mintInfo.is_multiple_nft && !this.address
                           ? html`
                               <div
                                 class="flex flex-col rounded-lg py-2 w-full items-center mt-4"
@@ -332,7 +410,7 @@ export class CheckoutWidget extends LitElement {
                                 >
                                   <p class="flex items-center text-base font-normal justify-center">Price</p>
                                   <p class="flex items-center text-base font-semibold justify-center">
-                                    ${this.active ? this.mintPrice : '-'} ${this.active ? (this.mintInfo.chain === 'ethereum' ? 'ETH' : 'MATIC') : null}
+                                    ${!!this.address ? this.mintPrice : '-'} ${!!this.address ? (this.mintInfo.chain === 'ethereum' ? 'ETH' : 'MATIC') : null}
                                   </p>
                                 </div>
                                 <div
@@ -345,11 +423,10 @@ export class CheckoutWidget extends LitElement {
                               "
                                 >
                                   <p class="flex items-center text-base font-normal justify-center">Total Mints</p>
-                                  <p class="flex items-center text-base font-semibold justify-center">${this.active ? this.remainingSupply : '-'}</p>
+                                  <p class="flex items-center text-base font-semibold justify-center">${!!this.address ? this.remainingSupply : '-'}</p>
                                 </div>
                               </div>
-                            `}
-                        `
+                            `} `
                       : this.stage === stages.TERMS
                       ? html` ${this.questions.length > 0
                             ? html` <div
@@ -377,7 +454,7 @@ export class CheckoutWidget extends LitElement {
                       : null}
                   </div>
                   <div class="absolute bottom-8 w-full">
-                    ${!this.active
+                    ${!this.address
                       ? html`<button
                           @click=${this.connectWallet}
                           class="w-full font-normal border border-white border-solid rounded cursor-pointer bg-black mt-2 uppercase"
@@ -488,7 +565,7 @@ export class CheckoutWidget extends LitElement {
                                     </div>`
                                   : null}
                                 <button
-                                  @click=${this.connectWallet}
+                                  @click=${this.mintNft}
                                   class="h-8 font-normal border border-solid border-white rounded bg-none cursor-pointer active:enabled:scale-[0.99]"
                                   style="width: ${!this.mintInfo.random_mint ? '50%' : '100%'};
                                     font-size: 14px;
@@ -503,7 +580,7 @@ export class CheckoutWidget extends LitElement {
                   </div>
                 </div>
                 <div
-                  class="flex ${this.breakpoint === 'mobile'
+                  class="flex ${this.breakpoint === 'mobile' || this.view === views.MINI
                     ? 'flex-row items-start justify-start mb-2 px-2'
                     : 'items-center justify-start flex-col mb-0 px-0'} gap-4 z-10"
                 >
@@ -524,15 +601,17 @@ export class CheckoutWidget extends LitElement {
                         `
                       )
                     : null}
-                  <div class="cursor-pointer">${this.active ? html`${out}` : null}</div>
+                  <div class="cursor-pointer">${!!this.address ? html`${out}` : null}</div>
                 </div>
                 <div class="absolute bottom-2 flex flex-row gap-2 w-full items-center justify-center">
-                  <p class="text-xs font-normal" style="color: ${this.mintInfo.checkout_font_color ? `${this.mintInfo.checkout_font_color}` : '#222221'}">Powered by:</p>
+                  <p class="text-xs font-normal" style="color: ${this.mintInfo.checkout_font_color ? `${this.mintInfo.checkout_font_color}` : '#222221'}">
+                    Powered by:
+                  </p>
                   ${logo}
                 </div>
               </div>`
             : html`
-                <div class="flex ${this.breakpoint === 'mobile' ? 'gap-4 flex-col' : 'gap-6 mx-10 flex-row'} p-9 mx-auto">
+                <div class="flex ${this.breakpoint === 'mobile' || this.view === views.MINI ? 'gap-4 flex-col' : 'gap-6 mx-10 flex-row'} p-9 mx-auto">
                   <div class="flex flex-col gap-8">
                     <div
                       class="grid w-full ${this.view === views.MINI
@@ -559,7 +638,7 @@ export class CheckoutWidget extends LitElement {
                         ? html`<lit-pagination
                             page="1"
                             total=${this.assets.length}
-                            limit=${this.breakpoint === 'mobile' ? 16 : 24}
+                            limit=${this.view === views.MINI ? 12 : this.breakpoint === 'mobile' ? 16 : 24}
                             size="2"
                             @click=${() => this.handlePagination()}
                           ></lit-pagination>`
@@ -602,7 +681,7 @@ export class CheckoutWidget extends LitElement {
                           `
                         )
                       : null}
-                    <div class="cursor-pointer">${this.active ? html`${out}` : null}</div>
+                    <div class="cursor-pointer">${!!this.address ? html`${out}` : null}</div>
                   </div>
                 </div>
               `}
