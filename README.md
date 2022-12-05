@@ -21,8 +21,11 @@ Check out the [Demo](https://ultraj0330.wixsite.com/nft-checkout)!
 Just add this line
 
 ```js
-<checkout-widget collectionid="f3e47701-a883-48d7-9e9a-d985792ab12e"></checkout-widget>
+<checkout-widget collectionid="<your_collection_id>" view="<normal | mini>"></checkout-widget>
 ```
+
+collectionid: Your collection id
+view: view mode, either normal or mini(with necessary fields only)
 
 **note: Above is sample code and demo purpose. Don't use it straightforward on production. Use it replacing collectionId with your project's id**
 
@@ -34,5 +37,5 @@ You can import DetailBox compoent and use directly in your front-end code.
 
 ```js
 <script src="https://unpkg.com/nft-checkout-html@0.0.1/dist/CheckoutWidget.1492b2e8.js"></script>
-<checkout-widget collectionid="f3e47701-a883-48d7-9e9a-d985792ab12e"></checkout-widget>
+<checkout-widget collectionid="<your_collection_id>" view="<normal | mini>"></checkout-widget>
 ```
