@@ -1,8 +1,8 @@
 import { ethers } from 'ethers';
-import { LitElement, html, css, CSSResultGroup } from 'lit';
+import { LitElement, html, CSSResultGroup } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { getMintInfo, getAllAssets, answerMintQuestions } from './api/mint';
-import { ViewType, StageType, stages, views } from './type';
+import { stages, views } from './type';
 import { style } from './styles/styles';
 import './CoverImage';
 import { logo, ethereum, twitter, facebook, instagram, discord, out } from './assets/logo';
@@ -122,20 +122,6 @@ export class CheckoutWidget extends LitElement {
   setWeb3 = async () => {
     const provider = new ethers.providers.Web3Provider(window.ethereum, 'any');
     this.provider = provider;
-
-    // const accounts = await window.ethereum.request({ method: 'eth_accounts' });
-    // if (accounts.length) {
-    //   this.active = true;
-    //   this.signer = provider.getSigner();
-    // }
-    // const addresses = await provider.send('eth_requestAccounts', []);
-    // this.address = addresses[0];
-    // this.signer = provider.getSigner();
-
-    // if (this.mintInfo.contract_address) {
-    //   const contract = new ethers.Contract(this.mintInfo.contract_address, abi, this.signer);
-    //   this.contract = contract;
-    // }
   };
 
   setInfo = async () => {

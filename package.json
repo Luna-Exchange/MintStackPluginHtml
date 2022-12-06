@@ -1,6 +1,6 @@
 {
   "name": "nft-checkout-html",
-  "version": "0.0.2",
+  "version": "0.0.9",
   "description": "HTML version of MintStack package based on Lit",
   "author": "Leon Jin <ultraj0330@gmail.com>",
   "repository": {
@@ -8,13 +8,13 @@
     "url": "git://github.com/Luna-Exchange/MintStackPluginHtml.git"
   },
   "type": "module",
-  "main": "dist/CheckoutWidget*.js.map",
-  "module": "dist/CheckoutWidget*.js.map",
-  "types": "dist/CheckoutWidget*.js.map",
+  "main": "dist/lib*.js",
+  "module": "dist/lib*.js",
+  "types": "dist/lib*.js",
   "exports": {
     ".": {
-      "import": "./dist/CheckoutWidget*.js.map",
-      "require": "./dist/CheckoutWidget*.js.map"
+      "import": "./dist/lib*.js",
+      "require": "./dist/lib*.js"
     }
   },
   "files": [
@@ -30,17 +30,19 @@
   },
   "license": "ISC",
   "devDependencies": {
-    "@babel/core": "^7.20.2",
-    "parcel-bundler": "^1.12.5",
     "prettier": "^2.7.1",
+    "shx": "^0.3.4",
     "tsup": "^6.5.0",
     "typescript": "^4.9.3"
   },
   "dependencies": {
+    "@babel/core": "^7.20.2",
     "autoprefixer": "^10.4.13",
     "axios": "^1.1.3",
     "ethers": "^5.7.2",
     "lit": "^2.4.1",
-    "lit-pagination": "^1.0.1"
+    "lit-pagination": "^1.0.1",
+    "parcel-bundler": "^1.12.5",
+    "util": "^0.12.5"
   }
 }

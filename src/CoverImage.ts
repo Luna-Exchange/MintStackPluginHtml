@@ -1,8 +1,5 @@
-import { ethers } from "ethers";
-import { LitElement, html, css, CSSResultGroup } from "lit";
+import { LitElement, html, CSSResultGroup } from "lit";
 import { customElement, property } from "lit/decorators.js";
-import { getMintInfo } from "./api/mint";
-import { ViewType, StageType, stages } from "./type";
 import { style } from "./styles/styles";
 
 @customElement("cover-image")
