@@ -13,7 +13,7 @@ Check out the [Demo](https://ultraj0330.wixsite.com/nft-checkout)!
 <!--
   You can embed the SDK in <head> tag of your site. Or just before <checkout-widget> code.
 -->
-<script src="https://unpkg.com/nft-checkout-html@0.0.9/dist/lib.4fe39073.js"></script>
+<script src="https://unpkg.com/nft-checkout-html@0.0.9/dist/index.js"></script>
 ```
 
 ### Set up widget
@@ -36,6 +36,6 @@ You can import DetailBox compoent and use directly in your front-end code.
 ### You can embed the SDK adding below code snippet to your site wix
 
 ```js
-<script src="https://unpkg.com/nft-checkout-html@0.0.9/dist/lib.4fe39073.js"></script>
+<script src="https://unpkg.com/nft-checkout-html@0.0.9/dist/index.js"></script>
 <checkout-widget collectionid="<your_collection_id>" view="<normal | mini>"></checkout-widget>
 ```

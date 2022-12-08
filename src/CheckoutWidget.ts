@@ -81,7 +81,7 @@ export class CheckoutWidget extends LitElement {
   selectedNftIndex: number | undefined = undefined;
 
   @property({ type: String })
-  breakpoint: string = 'desktop';
+  breakpoint: string = '';
 
   @property({ type: Number })
   currentPage: number = 1;
@@ -95,7 +95,9 @@ export class CheckoutWidget extends LitElement {
 
   private _handleResize = () => {
     // `this` refers to the component
+    console.log(window.innerWidth)
     this.breakpoint = window.innerWidth >= 768 ? 'desktop' : 'mobile';
+    console.log(this.breakpoint)
   };
 
   constructor() {
@@ -138,7 +140,6 @@ export class CheckoutWidget extends LitElement {
 
   getTokenInfo = async () => {
     const id = this.mintInfo.random_mint ? 1 : this.tokenId ? this.tokenId : 1;
-    console.log(id, this.contract);
     const resMintPrice = await this.contract.tokenPrices(Number(id));
     const mintPrice = parseFloat(ethers.utils.formatEther(resMintPrice.toString()));
 
@@ -459,12 +460,12 @@ export class CheckoutWidget extends LitElement {
                       ? html`<div class="flex items-center justify-center w-full h-full"></div>`
                       : this.mintSucceed
                       ? html`
-                          <div class="flex flex-col justify-center h-full relative">
+                          <div class="flex flex-col justify-center h-full relative mx-auto">
                             <p
-                              class="flex absolute -top-8 items-center justify-center text-xl font-normal align-center"
-                              style=" color: ${this.mintInfo.checkout_font_color ? `${this.mintInfo.checkout_font_color}` : 'white'} "
+                              class="flex absolute -top-8 items-center justify-center text-xl font-normal w-full items-center"
+                              style=" color: ${this.mintInfo.checkout_font_color ? `${this.mintInfo.checkout_font_color}` : '#222221'} "
                             >
-                              {nftCount} NFT is(are) successfully minted.
+                              ${this.nftCount} NFT is(are) successfully minted.
                             </p>
                             <button
                               class="font-normal border border-white border-solid rounded"
