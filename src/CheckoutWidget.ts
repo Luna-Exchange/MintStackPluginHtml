@@ -95,9 +95,9 @@ export class CheckoutWidget extends LitElement {
 
   private _handleResize = () => {
     // `this` refers to the component
-    console.log(window.innerWidth)
+    console.log(window.innerWidth);
     this.breakpoint = window.innerWidth >= 768 ? 'desktop' : 'mobile';
-    console.log(this.breakpoint)
+    console.log(this.breakpoint);
   };
 
   constructor() {
@@ -284,7 +284,7 @@ export class CheckoutWidget extends LitElement {
                 class="relative items-center justify-center w-full border border-white border-solid h-full border-none rounded-2xl"
                 style="max-height: 421px; max-width: 421px"
               >
-                ${this.selectedNftIndex
+                ${this.selectedNftIndex !== undefined && !isNaN(this.selectedNftIndex)
                   ? html` <img
                       src=${this.assets[this.selectedNftIndex].image}
                       alt=""
@@ -316,7 +316,11 @@ export class CheckoutWidget extends LitElement {
                       ? html`
                           <div class="flex flex-col" style="color: ${this.mintInfo.checkout_font_color ? `${this.mintInfo.checkout_font_color}` : '#222221'}">
                             <div class="flex flex-row gap-2 items-center">
-                              <p class="text-xl font-bold">${this.selectedNftIndex ? this.assets[this.selectedNftIndex].name : 'Insomnia Access Pass'}</p>
+                              <p class="text-xl font-bold">
+                                ${this.selectedNftIndex !== undefined && !isNaN(this.selectedNftIndex)
+                                  ? this.assets[this.selectedNftIndex].name
+                                  : this.mintInfo.organization_name}
+                              </p>
                               ${ethereum}
                             </div>
                             <p class="text-md font-normal">${this.mintInfo.name}</p>
@@ -628,7 +632,7 @@ export class CheckoutWidget extends LitElement {
                           font-size: 14px;
                           color: ${this.mintInfo.checkout_font_color ? `${this.mintInfo.checkout_font_color}` : 'white'};
                         "
-                        .disabled=${this.selectedNftIndex ? false : true}
+                        .disabled=${this.selectedNftIndex !== undefined && !isNaN(this.selectedNftIndex) ? false : true}
                         @click=${() => {
                           this.stage = this.questions.length > 0 ? stages.QUESTION : stages.NORMAL;
                         }}
