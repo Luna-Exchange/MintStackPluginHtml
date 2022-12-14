@@ -2,15 +2,23 @@ import { ethers } from 'ethers';
 import { LitElement, html, CSSResultGroup } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { getMintInfo, getAllAssets, answerMintQuestions } from './api/mint';
-import { stages, views } from './type';
+import { envs, EnvType, stages, views } from './type';
 import { style } from './styles/styles';
-import './CoverImage';
 import { logo, ethereum, twitter, facebook, instagram, discord, out } from './assets/logo';
 import abi from './assets/abi/collection.json';
 import 'lit-pagination';
 
 @customElement('checkout-widget')
 export class CheckoutWidget extends LitElement {
+  @property({ type: String })
+  collectionId: string = '';
+
+  @property({ type: String })
+  view: string = '';
+
+  @property({ type: String })
+  env: EnvType = envs.PRODUCTION;
+
   @property({ type: Object })
   provider: any = {};
 
@@ -25,12 +33,6 @@ export class CheckoutWidget extends LitElement {
 
   @property({ type: Object })
   contract: any = {};
-
-  @property({ type: String })
-  collectionId: string = '';
-
-  @property({ type: String })
-  view: string = '';
 
   @property({ type: Object })
   mintInfo: any = {};
@@ -127,13 +129,13 @@ export class CheckoutWidget extends LitElement {
   };
 
   setInfo = async () => {
-    const response = await getMintInfo(this.collectionId);
+    const response = await getMintInfo(this.collectionId, this.env);
     console.log(response);
     this.mintInfo = response;
     this.questions = Array.isArray(this.mintInfo.first_party_data) && this.mintInfo.first_party_data.map((item: any) => item.question);
 
     if (response.is_multiple_nft) {
-      const assetsResponse = await getAllAssets(this.collectionId);
+      const assetsResponse = await getAllAssets(this.collectionId, this.env);
       this.assets = assetsResponse.data.items.reverse();
     }
   };
@@ -163,7 +165,8 @@ export class CheckoutWidget extends LitElement {
       method: 'wallet_switchEthereumChain',
       params: [
         {
-          chainId: this.mintInfo.chain === 'ethereum' ? '0x5' : '0x13881',
+          chainId:
+            this.env === envs.DEVELOPMENT ? (this.mintInfo.chain === 'ethereum' ? '0x5' : '0x13881') : this.mintInfo.chain === 'ethereum' ? '0x1' : '0x89',
         },
       ],
     });
@@ -217,7 +220,7 @@ export class CheckoutWidget extends LitElement {
         answer: this.answers[index],
       }));
 
-      answerMintQuestions(this.collectionId, this.address, firstPartyAnswers)
+      answerMintQuestions(this.collectionId, this.address, firstPartyAnswers, this.env)
         .then(async (response: any) => {
           console.log('answerMintQuestions response:', response);
         })
@@ -285,17 +288,13 @@ export class CheckoutWidget extends LitElement {
                 style="max-height: 421px; max-width: 421px"
               >
                 ${this.selectedNftIndex !== undefined && !isNaN(this.selectedNftIndex)
-                  ? html` <img
+                  ? html`<img
                       src=${this.assets[this.selectedNftIndex].image}
                       alt=""
                       class="object-cover w-full h-full rounded-2xl"
                       style=" width: 421px; height: 421px "
                     />`
-                  : html` <cover-image
-                      .isRandomMint=${this.mintInfo.random_mint}
-                      .isMultipleNft=${this.mintInfo.is_multiple_nft}
-                      .assets=${!this.mintInfo.is_multiple_nft || this.mintInfo.random_mint ? this.mintInfo.image : this.assets}
-                    ></cover-image>`}
+                  : html`<img src=${this.mintInfo.image} alt="" class="object-cover w-full h-full rounded-2xl" style=" width: 421px; height: 421px " />`}
                 <div class="absolute" style=" inset: 0">
                   <div
                     style="background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(27, 28, 34, 0) 0.01%, #000000 100%);
