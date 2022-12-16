@@ -4,7 +4,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { getMintInfo, getAllAssets, answerMintQuestions } from './api/mint';
 import { envs, EnvType, stages, views } from './type';
 import { style } from './styles/styles';
-import { logo, ethereum, twitter, facebook, instagram, discord, out } from './assets/logo';
+import { logo, ethereum, polygon, twitter, facebook, instagram, discord, out } from './assets/logo';
 import abi from './assets/abi/collection.json';
 import 'lit-pagination';
 
@@ -320,7 +320,7 @@ export class CheckoutWidget extends LitElement {
                                   ? this.assets[this.selectedNftIndex].name
                                   : this.mintInfo.organization_name}
                               </p>
-                              ${ethereum}
+                              ${this.mintInfo.chain === 'ethereum' ? ethereum : polygon}
                             </div>
                             <p class="text-md font-normal">${this.mintInfo.name}</p>
                           </div>
@@ -468,7 +468,7 @@ export class CheckoutWidget extends LitElement {
                               class="flex absolute -top-8 items-center justify-center text-xl font-normal w-full items-center"
                               style=" color: ${this.mintInfo.checkout_font_color ? `${this.mintInfo.checkout_font_color}` : '#222221'} "
                             >
-                              ${this.nftCount} NFT is(are) successfully minted.
+                              ${this.nftCount} ${this.nftCount > 1 ? 'NFTs' : 'NFT'} successfully minted.
                             </p>
                             <button
                               class="font-normal border border-white border-solid rounded"
