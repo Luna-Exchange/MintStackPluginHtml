@@ -318,11 +318,11 @@ export class CheckoutWidget extends LitElement {
                               <p class="text-xl font-bold">
                                 ${this.selectedNftIndex !== undefined && !isNaN(this.selectedNftIndex)
                                   ? this.assets[this.selectedNftIndex].name
-                                  : this.mintInfo.organization_name}
+                                  : this.mintInfo.name}
                               </p>
                               ${this.mintInfo.chain === 'ethereum' ? ethereum : polygon}
                             </div>
-                            <p class="text-md font-normal">${this.mintInfo.name}</p>
+                            <p class="text-md font-normal">${this.mintInfo.organization_name}</p>
                           </div>
                         `
                       : null}
@@ -350,12 +350,9 @@ export class CheckoutWidget extends LitElement {
                                     <p
                                       class="flex items-center text-xs"
                                       style="
-                                      display: '-webkit-box';
-                                      -webkit-line-clamp: 2;
-                                      -Webkit-box-orient: 'vertical';
-                                      overflow: 'hidden';
+                                      overflow-y: scroll;
+                                      height: 60px;
                                       color: ${this.mintInfo.checkout_font_color ? `${this.mintInfo.checkout_font_color}` : '#222221'};
-                                      min-height: 32px
                                     "
                                     >
                                       ${this.mintInfo.description}
@@ -609,7 +606,7 @@ export class CheckoutWidget extends LitElement {
                               key="${index}"
                               src="${asset.image}"
                               class="cursor-pointer w-20 h-20 rounded-xl"
-                              style=" box-shadow: ${index === this.selectedNftIndex ? '0px 0px 4px 2px #8247E5' : 'none'}"
+                              style=" box-shadow: ${index === this.selectedNftIndex ? '0px 0px 4px 2px #109BEA' : 'none'}"
                               @click=${() => this.handleSelectNFT(index, asset)}
                             />`
                         )}
