@@ -288,13 +288,24 @@ export class CheckoutWidget extends LitElement {
                 style="max-height: 421px; max-width: 421px"
               >
                 ${this.selectedNftIndex !== undefined && !isNaN(this.selectedNftIndex)
-                  ? html`<img
-                      src=${this.assets[this.selectedNftIndex].image}
-                      alt=""
-                      class="object-cover w-full h-full rounded-2xl"
-                      style=" width: 421px; height: 421px "
-                    />`
-                  : html`<img src=${this.mintInfo.image} alt="" class="object-cover w-full h-full rounded-2xl" style=" width: 421px; height: 421px " />`}
+                  ? (
+                    this.assets[this.selectedNftIndex].image.slice(-3) === 'mp4' ?
+                      html`<video controls="" class="w-full h-full">
+                        <source src="${this.assets[this.selectedNftIndex].image}" type="video/mp4">
+                      </video>` :
+                      html`<img
+                          src=${this.assets[this.selectedNftIndex].image}
+                          alt=""
+                          class="object-cover w-full h-full rounded-2xl"
+                          style=" width: 421px; height: 421px "
+                        />`
+                  ) : (
+                    this.mintInfo.image.slice(-3) === 'mp4' ? 
+                      html`<video controls="" class="w-full h-full">
+                        <source src="${this.mintInfo.image}" type="video/mp4">
+                      </video>` :
+                      html`<img src=${this.mintInfo.image} alt="" class="object-cover w-full h-full rounded-2xl" style=" width: 421px; height: 421px " />`
+                  )}
                 <div class="absolute" style=" inset: 0">
                   <div
                     style="background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(27, 28, 34, 0) 0.01%, #000000 100%);
@@ -462,7 +473,7 @@ export class CheckoutWidget extends LitElement {
                       ? html`
                           <div class="flex flex-col justify-center h-full relative mx-auto">
                             <p
-                              class="flex absolute -top-8 items-center justify-center text-xl font-normal w-full items-center"
+                              class="flex absolute -top-8 items-center justify-center text-xl font-normal w-full items-center text-center"
                               style=" color: ${this.mintInfo.checkout_font_color ? `${this.mintInfo.checkout_font_color}` : '#222221'} "
                             >
                               ${this.nftCount} ${this.nftCount > 1 ? 'NFTs' : 'NFT'} successfully minted.
