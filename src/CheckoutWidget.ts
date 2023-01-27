@@ -187,10 +187,11 @@ export class CheckoutWidget extends LitElement {
         return;
       }
 
+      if (this.mintPrice === undefined) return;
+
       this.mintProcessing = true;
       const count = this.mintInfo.random_mint ? 1 : this.nftCount;
       // console.log(account, this.mintInfo.random_mint ? 1 : tokenId ? tokenId : 1, count);
-      if (!this.mintPrice) return;
       try {
         const tx = await this.contract.mint(this.address, this.mintInfo.random_mint ? 1 : this.tokenId ? this.tokenId : 1, count, {
           value: ethers.utils.parseEther((this.mintPrice * count).toString()),
@@ -399,7 +400,7 @@ export class CheckoutWidget extends LitElement {
                           </div>`
                       : null}
                   </div>
-                  ${this.stage !== stages.TERMS && (this.mintInfo.is_multiple_nft && !this.address
+                  ${this.stage !== stages.TERMS ? (this.mintInfo.is_multiple_nft && !this.address
                     ? html`
                         <div
                           class="flex flex-col rounded-lg py-2 w-full items-center mt-4"
@@ -442,7 +443,7 @@ export class CheckoutWidget extends LitElement {
                             <p class="flex items-center text-base font-semibold justify-center">${!!this.address ? this.remainingSupply : '-'}</p>
                           </div>
                         </div>
-                      `)}
+                      `) : ``}
                   <div class="absolute bottom-8 w-full">
                     ${!this.address
                       ? html`<button
