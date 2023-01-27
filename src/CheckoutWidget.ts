@@ -372,50 +372,7 @@ export class CheckoutWidget extends LitElement {
                                 : null}
                             </div> `
                           : null}
-                        ${this.mintInfo.is_multiple_nft && !this.address
-                          ? html`
-                              <div
-                                class="flex flex-col rounded-lg py-2 w-full items-center mt-4"
-                                style="
-                                  color: ${this.mintInfo.checkout_font_color ? `${this.mintInfo.checkout_font_color}` : '#222221'};
-                                  border: '1px solid #E8E8E8';
-                                  background-color: ${this.mintInfo.checkout_background_color ? `${this.mintInfo.checkout_background_color}80` : '#F8F8F8'}
-                                  "
-                              >
-                                <p>Total Collection</p>
-                                <p>${this.assets?.length} NFT</p>
-                              </div>
-                            `
-                          : html`
-                              <div class="flex flex-row justify-between pt-4 gap-2">
-                                <div
-                                  class="flex flex-col gap-1 rounded-lg py-2"
-                                  style="
-                                width: 150px;
-                                color: ${this.mintInfo.checkout_font_color ? `${this.mintInfo.checkout_font_color}` : '#222221'};
-                                border: '1px solid #E8E8E8';
-                                background-color: ${this.mintInfo.checkout_background_color ? `${this.mintInfo.checkout_background_color}80` : '#F8F8F8'}
-                              "
-                                >
-                                  <p class="flex items-center text-base font-normal justify-center">Price</p>
-                                  <p class="flex items-center text-base font-semibold justify-center">
-                                    ${!!this.address ? this.mintPrice : '-'} ${!!this.address ? (this.mintInfo.chain === 'ethereum' ? 'ETH' : 'MATIC') : null}
-                                  </p>
-                                </div>
-                                <div
-                                  class="flex flex-col gap-1 rounded-lg py-2"
-                                  style="
-                                width: 150px;
-                                color: ${this.mintInfo.checkout_font_color ? `${this.mintInfo.checkout_font_color}` : '#222221'};
-                                border: '1px solid #E8E8E8';
-                                background-color: ${this.mintInfo.checkout_background_color ? `${this.mintInfo.checkout_background_color}80` : '#F8F8F8'}
-                              "
-                                >
-                                  <p class="flex items-center text-base font-normal justify-center">Total Mints</p>
-                                  <p class="flex items-center text-base font-semibold justify-center">${!!this.address ? this.remainingSupply : '-'}</p>
-                                </div>
-                              </div>
-                            `} `
+                        `
                       : this.stage === stages.TERMS
                       ? html` ${this.questions.length > 0
                             ? html` <div
@@ -442,6 +399,50 @@ export class CheckoutWidget extends LitElement {
                           </div>`
                       : null}
                   </div>
+                  ${this.stage !== stages.TERMS && (this.mintInfo.is_multiple_nft && !this.address
+                    ? html`
+                        <div
+                          class="flex flex-col rounded-lg py-2 w-full items-center mt-4"
+                          style="
+                            color: ${this.mintInfo.checkout_font_color ? `${this.mintInfo.checkout_font_color}` : '#222221'};
+                            border: '1px solid #E8E8E8';
+                            background-color: ${this.mintInfo.checkout_background_color ? `${this.mintInfo.checkout_background_color}80` : '#F8F8F8'}
+                            "
+                        >
+                          <p>Total Collection</p>
+                          <p>${this.assets?.length} NFT</p>
+                        </div>
+                      `
+                    : html`
+                        <div class="flex flex-row justify-between pt-4 gap-2">
+                          <div
+                            class="flex flex-col gap-1 rounded-lg py-2"
+                            style="
+                          width: 150px;
+                          color: ${this.mintInfo.checkout_font_color ? `${this.mintInfo.checkout_font_color}` : '#222221'};
+                          border: '1px solid #E8E8E8';
+                          background-color: ${this.mintInfo.checkout_background_color ? `${this.mintInfo.checkout_background_color}80` : '#F8F8F8'}
+                        "
+                          >
+                            <p class="flex items-center text-base font-normal justify-center">Price</p>
+                            <p class="flex items-center text-base font-semibold justify-center">
+                              ${!!this.address ? this.mintPrice : '-'} ${!!this.address ? (this.mintInfo.chain === 'ethereum' ? 'ETH' : 'MATIC') : null}
+                            </p>
+                          </div>
+                          <div
+                            class="flex flex-col gap-1 rounded-lg py-2"
+                            style="
+                          width: 150px;
+                          color: ${this.mintInfo.checkout_font_color ? `${this.mintInfo.checkout_font_color}` : '#222221'};
+                          border: '1px solid #E8E8E8';
+                          background-color: ${this.mintInfo.checkout_background_color ? `${this.mintInfo.checkout_background_color}80` : '#F8F8F8'}
+                        "
+                          >
+                            <p class="flex items-center text-base font-normal justify-center">Total Mints</p>
+                            <p class="flex items-center text-base font-semibold justify-center">${!!this.address ? this.remainingSupply : '-'}</p>
+                          </div>
+                        </div>
+                      `)}
                   <div class="absolute bottom-8 w-full">
                     ${!this.address
                       ? html`<button

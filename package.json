@@ -1,6 +1,6 @@
 {
   "name": "@insomnia-labs/mintstack-sdk-html",
-  "version": "0.0.7",
+  "version": "0.0.11",
   "description": "HTML version of MintStack package based on Lit",
   "author": "Leon Jin <ultraj0330@gmail.com>",
   "repository": {
