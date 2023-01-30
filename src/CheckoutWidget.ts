@@ -578,21 +578,21 @@ export class CheckoutWidget extends LitElement {
                   ${this.view === views.NORMAL && this.mintInfo.social_links?.length > 0
                     ? this.mintInfo.social_links.map(
                         (link: any, index: any) => html`
-                          <a key=${index} href=${link.url} target="_blank" rel="noreferrer"
+                          <a key=${index} href=${link.url} target="_blank" rel="noreferrer" style="color: ${this.mintInfo.checkout_font_color ? this.mintInfo.checkout_font_color : '#222221'}"
                             >${link.name === 'twitter'
-                              ? html`${twitter}`
+                              ? html`${twitter(this.mintInfo.checkout_font_color ? this.mintInfo.checkout_font_color : '#222221')}`
                               : link.name === 'facebook'
-                              ? html`${facebook}`
+                              ? html`${facebook(this.mintInfo.checkout_font_color ? this.mintInfo.checkout_font_color : '#222221')}`
                               : link.name === 'instagram'
-                              ? html`${instagram}`
+                              ? html`${instagram(this.mintInfo.checkout_font_color ? this.mintInfo.checkout_font_color : '#222221')}`
                               : link.name === 'discord'
-                              ? html`${discord}`
+                              ? html`${discord(this.mintInfo.checkout_font_color ? this.mintInfo.checkout_font_color : '#222221')}`
                               : null}</a
                           >
                         `
                       )
                     : null}
-                  <div class="cursor-pointer">${!!this.address ? html`${out}` : null}</div>
+                  <div class="cursor-pointer">${!!this.address ? html`${out(this.mintInfo.checkout_font_color ? this.mintInfo.checkout_font_color : '#222221')}` : null}</div>
                 </div>
                 <div class="absolute bottom-2 flex flex-row gap-2 w-full items-center justify-center">
                   <p class="text-xs font-normal" style="color: ${this.mintInfo.checkout_font_color ? `${this.mintInfo.checkout_font_color}` : '#222221'}">
