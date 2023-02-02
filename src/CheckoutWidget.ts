@@ -470,7 +470,9 @@ export class CheckoutWidget extends LitElement {
                           agree and proceed
                         </button>`
                       : this.mintProcessing
-                      ? html`<div class="flex items-center justify-center w-full h-full"></div>`
+                      ? html`<div class="flex items-center justify-center w-full h-full spinner-border text-primary">
+                          <span class="loader"></span>
+                        </div>`
                       : this.mintSucceed
                       ? html`
                           <div class="flex flex-col justify-center h-full relative mx-auto">
