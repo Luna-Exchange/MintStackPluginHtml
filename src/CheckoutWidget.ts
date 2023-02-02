@@ -74,7 +74,7 @@ export class CheckoutWidget extends LitElement {
   mintSucceed: boolean = false;
 
   @property({ type: Number })
-  nftCount: number = 0;
+  nftCount: number = 1;
 
   @property({ type: Object })
   assetsList: any = [];
@@ -672,7 +672,7 @@ export class CheckoutWidget extends LitElement {
                           `
                         )
                       : null}
-                    <div class="cursor-pointer">${!!this.address ? html`${out}` : null}</div>
+                    <div class="cursor-pointer">${!!this.address ? html`${out(this.mintInfo.checkout_font_color ? this.mintInfo.checkout_font_color : '#222221')}` : null}</div>
                   </div>
                 </div>
               `}
